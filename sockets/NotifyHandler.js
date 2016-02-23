@@ -3,18 +3,23 @@ var config={};
 io.on('connection', function (socket) {
 	config.socket=socket;
 	socket.emit('socketConnected', { status: 'socket connected' });
-	/*socket.on('my other event', function (data) {
-		console.log(data);
-	});*/
 });
 
 module.exports={
 
 	config:config,
 
+	io:io,
+
 	PushNewAds:function(listAds)
 	{
 		console.log("=======PushNewAds=======");
-		this.config.socket.emit('PushNewAds',listAds);
+		io.emit('PushNewAds',listAds);
+	},
+
+	UpdateAdsPosition:function(listAds)
+	{
+		console.log("=======UpdateAdsPosition=======");
+		io.emit('UpdateAdsPosition', listAds);
 	}
 }

@@ -17,27 +17,35 @@ var parsePage = function(url) {
     var q = $q.defer();
     try {
         request(url, function(err, resp, body) {
-            $ = cheerio.load(body);
-            rows = $('.chotot-list-row'); //use your CSS selector here
-            $(rows).each(function(i, item) {
-                var image = $(item).find('.listing_thumbs_image a img').attr('data-original');
-                if (!image)
-                    image = $(item).find('.listing_thumbs_image a img').attr('src');
-                var text = $(item).find('.thumbs_subject .ad-subject').attr('title');
-                var link = $(item).find('.thumbs_subject .ad-subject').attr('href');
-                var token_strikethrough = link.split("-");
-                var token_dot = token_strikethrough[token_strikethrough.length - 1].split('.');
-                var id = token_dot[0];
-                if (!idTracking[id]) {
-                    listNew.push({ text: text, id: id , image:image})
-                    idTracking[id] = text;
-                }
-                else
-                {
-                	return false;
-                }
-            });
-            q.resolve({status:'success'});
+            if(err)
+            {
+                throw err;
+            }
+            else
+            {
+                $ = cheerio.load(body);
+                rows = $('.chotot-list-row'); //use your CSS selector here
+                $(rows).each(function(i, item) {
+                    var image = $(item).find('.listing_thumbs_image a img').attr('data-original');
+                    if (!image)
+                        image = $(item).find('.listing_thumbs_image a img').attr('src');
+                    var text = $(item).find('.thumbs_subject .ad-subject').attr('title');
+                    var link = $(item).find('.thumbs_subject .ad-subject').attr('href');
+                    var token_strikethrough = link.split("-");
+                    var token_dot = token_strikethrough[token_strikethrough.length - 1].split('.');
+                    var id = token_dot[0];
+                    if (!idTracking[id]) {
+                        listNew.push({ text: text, id: id , image:image})
+                        idTracking[id] = text;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                });
+                q.resolve({status:'success'});
+            }
+            
         });
     } catch (e) {
         q.reject(e);
@@ -69,12 +77,10 @@ var parseListPages=function(index)
             listNew=[];
         }
     },function(err){
-        
+        console.log(err);
     })
     
 }
-
-
 
 module.exports={
 

@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var PageParser=require('./parsers/PageParser');
 var NotifyHandler=require('./sockets/NotifyHandler');
+var _=require('lodash');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -34,19 +35,27 @@ PageParser.updateAds();
 setInterval(function(){
     console.log("================TIMER RUN UPDATE==============");
     PageParser.updateAds();
-},5000);
+},10000);
 
-/*app.get('/test', function(req, res) {
-    if(PageParser.config.loadFinished)
-        res.json(PageParser.listAds);
-    else
-        res.send("Please waiting");
-})*/
+app.get('/GetAllAds', function(req, res) {
+    PageParser.updateAds();
+    res.json("OK");
+})
 
 app.get('/updateAds',function(req,res){
     PageParser.updateAds();
     res.json({status:'handling'});
 });
+
+app.get('/ChangeAdsPosition',function(req,res){
+    console.log("============ChangeAdsPosition=================");
+    var item=_.cloneDeep(PageParser.listAds[req.query.oldIndex]);
+    PageParser.listAds.splice(req.query.oldIndex,1);
+    PageParser.listAds.splice(req.query.newIndex,0,item);
+    NotifyHandler.UpdateAdsPosition(PageParser.listAds);
+    res.json({status:'ok',date:new Date()});
+})
+
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
