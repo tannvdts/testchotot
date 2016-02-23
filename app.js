@@ -4,7 +4,18 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var PageParser=require('./parsers/PageParser');
+
+var maxNumPages=1;
+var interval=10;
+if (process.argv.indexOf("--maxNumPages") >= 0) {
+    maxNumPages=process.argv[process.argv.indexOf("--maxNumPages")+1];
+}
+if(process.argv.indexOf('--interval')>=0)
+{
+    interval=process.argv[process.argv.indexOf("--interval")+1];
+}
+
+var PageParser=require('./parsers/PageParser')(maxNumPages);
 var NotifyHandler=require('./sockets/NotifyHandler');
 var _=require('lodash');
 
@@ -35,7 +46,7 @@ PageParser.updateAds();
 setInterval(function(){
     console.log("================TIMER RUN UPDATE==============");
     PageParser.updateAds();
-},10000);
+},interval*1000);
 
 app.get('/GetAllAds', function(req, res) {
     PageParser.updateAds();

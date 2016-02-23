@@ -9,7 +9,6 @@ var listAds = [];
 var idTracking = {};
 
 var config={
-	maxNumPages:1,
 	loadFinished:false
 }
 
@@ -59,7 +58,7 @@ var parseListPages=function(index)
 	var url='http://www.chotot.vn/tp-ho-chi-minh/mua-ban?o='+index;
     parsePage(url)
     .then(function(data){
-        if(index<=config.maxNumPages)
+        if(index<config.maxNumPages)
         {
             parseListPages(index+1);
         }
@@ -82,17 +81,24 @@ var parseListPages=function(index)
     
 }
 
-module.exports={
+module.exports=function(maxNumPages)
+{
+    if(maxNumPages && maxNumPages>0)
+        config.maxNumPages=maxNumPages;
 
-	listAds:listAds,
+    return {
 
-	idTracking:idTracking,
+        listAds:listAds,
 
-	config:config,
+        idTracking:idTracking,
 
-	updateAds:function()
-	{
-		config.initFinished=false;
-		parseListPages(1);
-	}
+        config:config,
+
+        updateAds:function()
+        {
+            config.initFinished=false;
+            parseListPages(1);
+        }
+    }
 }
+
